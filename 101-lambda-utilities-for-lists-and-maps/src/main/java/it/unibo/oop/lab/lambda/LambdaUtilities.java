@@ -2,19 +2,18 @@ package it.unibo.oop.lab.lambda;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-
-import static java.util.Collections.emptyList;
-import static java.util.Collections.emptyMap;
 
 /**
  * This class will contain four utility functions on lists and maps, of which the first one is provided as example.
@@ -68,7 +67,11 @@ public final class LambdaUtilities {
         /*
          * Suggestion: consider Optional.filter
          */
-        return emptyList();
+        final List<Optional<T>> l = new ArrayList<>(list.size() * 2);
+        list.forEach(t -> {
+            l.add(Optional.of(t).filter(pre));
+        });
+        return l;
     }
 
     /**
@@ -89,7 +92,16 @@ public final class LambdaUtilities {
         /*
          * Suggestion: consider Map.merge
          */
-        return emptyMap();
+        Map<R, Set<T>> map = new HashMap<>();
+        final BiFunction<Set<T>, Set<T>, Set<T>> append = (list1,list2) -> {
+            final var result = new LinkedHashSet<>(list1);
+            result.addAll(list2);
+            return result;
+        };
+        list.forEach(t -> {
+            map.merge(op.apply(t), Set.of(t), append);
+        });
+        return map;
     }
 
     /**
@@ -112,7 +124,11 @@ public final class LambdaUtilities {
          *
          * Keep in mind that a map can be iterated through its forEach method
          */
-        return emptyMap();
+        final Map<K, V> newMap = new HashMap<>();
+        map.forEach((k,v) -> {
+            newMap.put(k, v.orElse(def.get()));
+        });
+        return newMap;
     }
 
     /**
