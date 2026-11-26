@@ -1,11 +1,11 @@
 package it.unibo.mvc;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
+
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 /**
  * This class implements a view that can write on any PrintStream.
@@ -59,6 +59,10 @@ public final class PrintStreamView implements DrawNumberView {
     @Override
     public void result(final DrawResult res) {
         out.println(res.getDescription());
+    }
+
+    public void displayError(final String message){
+        out.println("Error: " + message);
     }
 
 }

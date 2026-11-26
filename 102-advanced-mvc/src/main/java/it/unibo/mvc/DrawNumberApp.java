@@ -1,18 +1,25 @@
 package it.unibo.mvc;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-
+import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.util.Arrays;
 import java.util.List;
+
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 /**
  * Application entry point for DrawNumber game.
  */
 public final class DrawNumberApp implements DrawNumberViewObserver {
-    private static final int MIN = 0;
-    private static final int MAX = 100;
-    private static final int ATTEMPTS = 10;
+    private int MIN = 0;
+    private int MAX = 0;
+    private int ATTEMPTS = 0;
+
+    private static final File config = new File(System.getProperty("user.dir")
+        + File.separator + "src" + File.separator + "main" + File.separator
+        + "resources" + File.separator + "config.yml"); 
 
     private final DrawNumber model;
     private final List<DrawNumberView> views;
@@ -31,6 +38,20 @@ public final class DrawNumberApp implements DrawNumberViewObserver {
         for (final DrawNumberView view: views) {
             view.setObserver(this);
             view.start();
+        }
+        try (BufferedReader br = new BufferedReader(new FileReader(config))){
+            String line = br.readLine();
+            String[] splitLine = line.split(":");
+            MIN = Integer.decode(splitLine[1].trim());
+            line = br.readLine();
+            splitLine = line.split(":");
+            MAX = Integer.decode(splitLine[1].trim());
+            line = br.readLine();
+            splitLine = line.split(":");
+            ATTEMPTS = Integer.decode(splitLine[1].trim());
+    
+        } catch (Exception e) {
+            IO.println(e.getMessage());
         }
         this.model = new DrawNumberImpl(MIN, MAX, ATTEMPTS);
     }
@@ -75,7 +96,10 @@ public final class DrawNumberApp implements DrawNumberViewObserver {
      * @throws FileNotFoundException if the configuration file cannot be fetched
      */
     public static void main() throws FileNotFoundException {
-        new DrawNumberApp(new DrawNumberViewImpl());
+        new DrawNumberApp(new DrawNumberViewImpl(), 
+        new DrawNumberViewImpl(), 
+        new PrintStreamView(System.out), 
+        new PrintStreamView("log.txt"));
     }
 
 }
